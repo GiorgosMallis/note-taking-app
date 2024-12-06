@@ -4,9 +4,9 @@ export interface Note {
   content: string;
   createdAt: string;
   updatedAt: string;
-  categoryId?: string | null;
+  categoryId: string | null;
   tags: string[];
-  isPinned?: boolean;
+  isPinned: boolean;
 }
 
 export type NoteCreateInput = Omit<Note, 'id' | 'createdAt' | 'updatedAt'>;

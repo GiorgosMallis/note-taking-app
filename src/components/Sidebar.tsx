@@ -11,7 +11,10 @@ interface SidebarProps {
   selectedTag: string | null;
   onCategoryUpdate: (category: Category) => void;
   onTagUpdate: (tag: Tag) => void;
-  t: (key: string) => string;
+  onNewCategory: () => void;
+  onNewTag: () => void;
+  searchQuery: string;
+  onSearch: (query: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -23,7 +26,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedTag,
   onCategoryUpdate,
   onTagUpdate,
-  t,
+  onNewCategory,
+  onNewTag,
+  searchQuery,
+  onSearch,
 }) => {
   const [editingItem, setEditingItem] = useState<{
     item: Category | Tag | null;
@@ -45,113 +51,130 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div className="bg-light-surface dark:bg-dark-surface shadow-lg h-screen fixed left-0 top-0 z-30 w-64">
-        <div className="p-4 overflow-y-auto h-full">
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary">
-                {t('Categories')}
-              </h2>
+      <div className="w-64 h-full bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border flex flex-col">
+        {/* Search Bar */}
+        <div className="p-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
+              className="w-full px-4 py-2 pl-10 bg-light-accent/50 dark:bg-dark-accent/50 border border-light-border dark:border-dark-border rounded-xl text-light-text-primary dark:text-dark-text-primary placeholder-light-text-muted dark:placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-light-accent dark:focus:ring-dark-accent"
+            />
+            <svg
+              className="absolute left-3 top-2.5 w-5 h-5 text-light-text-muted dark:text-dark-text-muted"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* Categories Section */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="px-3 mb-6">
+            <div className="flex items-center justify-between mb-2 px-2">
+              <h2 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary">Categories</h2>
               <button
-                onClick={() => setEditingItem({ type: 'category', item: null })}
-                className="p-1.5 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent transition-colors"
+                onClick={onNewCategory}
+                className="p-1 rounded-lg hover:bg-light-accent dark:hover:bg-dark-accent text-light-text-muted dark:text-dark-text-muted transition-colors"
+                title="Add category"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <button
                 onClick={() => onCategorySelect(null)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
                   selectedCategory === null
-                    ? 'bg-primary text-white'
-                    : 'text-light-text-primary dark:text-dark-text-primary hover:bg-light-accent dark:hover:bg-dark-accent'
+                    ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
+                    : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
                 }`}
               >
-                {t('All Categories')}
+                <span className="flex-1 text-left">All Categories</span>
               </button>
               {categories.map((category) => (
-                <div key={category.id} className="group relative">
+                <button
+                  key={category.id}
+                  onClick={() => onCategorySelect(category.id)}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
+                    selectedCategory === category.id
+                      ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
+                      : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
+                  }`}
+                >
+                  <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: category.color }} />
+                  <span className="text-sm truncate">{category.name}</span>
                   <button
-                    onClick={() => onCategorySelect(category.id)}
-                    className={`w-full text-left pl-3 pr-12 py-2 rounded-lg transition-colors flex items-center ${
-                      selectedCategory === category.id
-                        ? 'bg-primary text-white'
-                        : 'text-light-text-primary dark:text-dark-text-primary hover:bg-light-accent dark:hover:bg-dark-accent'
-                    }`}
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clipRule="evenodd" />
-                      <path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z" />
-                    </svg>
-                    <span className="flex-1">{t(category.name)}</span>
-                    <div className="w-3 h-3 rounded-full ml-2" style={{ backgroundColor: category.color }} />
-                  </button>
-                  <button
-                    onClick={() => setEditingItem({ type: 'category', item: category })}
+                    onClick={() => handleEdit(category, 'category')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                </div>
+                </button>
               ))}
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary">
-                {t('Tags')}
-              </h2>
+          {/* Tags Section */}
+          <div className="px-3">
+            <div className="flex items-center justify-between mb-2 px-2">
+              <h2 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary">Tags</h2>
               <button
-                onClick={() => setEditingItem({ type: 'tag', item: null })}
-                className="p-1.5 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent transition-colors"
+                onClick={onNewTag}
+                className="p-1 rounded-lg hover:bg-light-accent dark:hover:bg-dark-accent text-light-text-muted dark:text-dark-text-muted transition-colors"
+                title="Add tag"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <button
                 onClick={() => onTagSelect(null)}
-                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
                   selectedTag === null
-                    ? 'bg-primary text-white'
-                    : 'text-light-text-primary dark:text-dark-text-primary hover:bg-light-accent dark:hover:bg-dark-accent'
+                    ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
+                    : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
                 }`}
               >
-                {t('All Tags')}
+                <span className="flex-1 text-left">All Tags</span>
               </button>
               {tags.map((tag) => (
-                <div key={tag.id} className="group relative">
+                <button
+                  key={tag.id}
+                  onClick={() => onTagSelect(tag.id)}
+                  className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
+                    selectedTag === tag.id
+                      ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
+                      : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
+                  }`}
+                >
+                  <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: tag.color }} />
+                  <span className="text-sm truncate">{tag.name}</span>
                   <button
-                    onClick={() => onTagSelect(tag.id)}
-                    className={`w-full text-left pl-3 pr-12 py-2 rounded-lg transition-colors flex items-center ${
-                      selectedTag === tag.id
-                        ? 'bg-primary text-white'
-                        : 'text-light-text-primary dark:text-dark-text-primary hover:bg-light-accent dark:hover:bg-dark-accent'
-                    }`}
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                    </svg>
-                    <span className="flex-1">{t(tag.name)}</span>
-                    <div className="w-3 h-3 rounded-full ml-2" style={{ backgroundColor: tag.color }} />
-                  </button>
-                  <button
-                    onClick={() => setEditingItem({ type: 'tag', item: tag })}
+                    onClick={() => handleEdit(tag, 'tag')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                </div>
+                </button>
               ))}
             </div>
           </div>

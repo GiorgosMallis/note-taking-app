@@ -2,7 +2,7 @@
   "name": "note-taking-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://giorgos.github.io/note-taking-app",
+  "homepage": "https://giorgosmallis.github.io/note-taking-app",
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
@@ -33,6 +33,7 @@
     "postcss": "^8.4.49",
     "quill": "^2.0.3",
     "react": "^18.3.1",
+    "react-calendar": "^5.1.0",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-quill": "^2.0.0",
@@ -70,6 +71,6 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
-    "gh-pages": "^4.0.0"
+    "gh-pages": "^6.2.0"
   }
 }
