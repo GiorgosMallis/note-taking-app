@@ -49,12 +49,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
             className="w-full text-xl font-semibold bg-transparent border-none outline-none text-light-text-primary dark:text-dark-text-primary placeholder-light-text-muted dark:placeholder-dark-text-muted"
           />
         </div>
-        <button
-          onClick={onSave}
-          className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors"
-        >
-          Save
-        </button>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={onSave}
+            className="px-4 py-2 bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Save
+          </button>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto">
         <div className="p-4">

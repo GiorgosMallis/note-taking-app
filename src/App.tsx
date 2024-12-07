@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NoteEditor from './components/NoteEditor';
 import Sidebar from './components/Sidebar';
-import NotesPreview from './components/NotesPreview';
+import { NotesPreview } from './components/NotesPreview';
 import { Note } from './types/Note';
 import { Category } from './types/Category';
 import { Tag } from './types/Tag';
@@ -126,22 +126,17 @@ function App() {
     ));
   };
 
-  const sortedNotes = [...notes].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
+  const handleReorderNotes = (reorderedNotes: Note[]) => {
+    setNotes(reorderedNotes);
+    localStorage.setItem('notes', JSON.stringify(reorderedNotes));
+  };
 
-  const filteredNotes = sortedNotes.filter(note => {
+  const filteredNotes = notes.filter((note) => {
+    const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = !selectedCategory || note.categoryId === selectedCategory;
     const matchesTag = !selectedTag || (note.tags && note.tags.includes(selectedTag));
-    const matchesSearch = !searchQuery || (
-      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (note.categoryId && getCategoryName(note.categoryId).toLowerCase().includes(searchQuery.toLowerCase())) ||
-      note.tags.some(tagId => getTagName(tagId).toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-    return matchesCategory && matchesTag && matchesSearch;
+    return matchesSearch && matchesCategory && matchesTag;
   });
 
   const handleNoteSelect = (note: Note) => {
@@ -238,7 +233,7 @@ function App() {
               </button>
               <button
                 onClick={handleCreateNote}
-                className="px-3 sm:px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg shadow-lg hover:shadow-primary/20 transform hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base"
+                className="px-3 sm:px-4 py-2 bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary rounded-lg hover:opacity-90 transition-opacity"
               >
                 New Note
               </button>
@@ -254,8 +249,9 @@ function App() {
               onNoteSelect={handleNoteSelect}
               onDeleteNote={handleDeleteNote}
               onTogglePin={handleTogglePin}
-              onCategorySelect={(categoryId) => setSelectedCategory(categoryId)}
-              onTagSelect={(tagId) => setSelectedTag(tagId)}
+              onCategorySelect={(categoryId: string) => setSelectedCategory(categoryId)}
+              onTagSelect={(tagId: string) => setSelectedTag(tagId)}
+              onReorder={handleReorderNotes}
             />
           </div>
         </div>

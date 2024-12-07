@@ -9,10 +9,12 @@ import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
 import { SuggestionProps, SuggestionKeyDownProps } from '@tiptap/suggestion'
 import React, { useState, useCallback } from 'react'
+import '../styles/editor.css';
 
 interface RichTextEditorProps {
   content: string
   onChange: (content: string) => void
+  readOnly?: boolean
 }
 
 interface MentionItem {
@@ -37,22 +39,34 @@ interface MentionSuggestionProps extends SuggestionProps {
 
 const lowlight = createLowlight(common)
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ content, onChange }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({ content, onChange, readOnly = false }) => {
   const [wordCount, setWordCount] = useState({ words: 0, characters: 0 })
   const [linkUrl, setLinkUrl] = useState('')
   const [showLinkInput, setShowLinkInput] = useState(false)
+  const [showImageInput, setShowImageInput] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
 
   const editor = useEditor({
     extensions: [
       StarterKit,
-      TaskList,
+      TaskList.configure({
+        HTMLAttributes: {
+          class: 'task-list',
+        },
+      }),
       TaskItem.configure({
+        HTMLAttributes: {
+          class: 'task-item',
+        },
         nested: true,
       }),
       CodeBlockLowlight.configure({
         lowlight,
       }),
       Image.configure({
+        HTMLAttributes: {
+          class: 'rounded-lg shadow-md max-w-full mx-auto my-4',
+        },
         inline: true,
         allowBase64: true,
       }),
@@ -192,6 +206,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ content, onChange }) =>
         class: 'prose dark:prose-invert max-w-none focus:outline-none min-h-[200px] px-4 py-2',
       },
     },
+    editable: !readOnly,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
       const text = editor.state.doc.textContent
@@ -205,6 +220,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ content, onChange }) =>
   if (!editor) {
     return null
   }
+
+  const addImage = () => {
+    if (imageUrl) {
+      editor?.commands.setImage({ src: imageUrl });
+      setImageUrl('');
+      setShowImageInput(false);
+    }
+  };
 
   const MenuButton = ({ 
     onClick, 
@@ -400,6 +423,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ content, onChange }) =>
             </svg>
           </MenuButton>
           <MenuButton
+            onClick={() => setShowImageInput(true)}
+            title="Insert Image URL"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </MenuButton>
+          <MenuButton
             onClick={handleSetLink}
             isActive={editor.isActive('link')}
             title="Insert Link"
@@ -447,6 +478,44 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ content, onChange }) =>
           >
             Add Link
           </button>
+        </div>
+      )}
+
+      {/* Image Input */}
+      {showImageInput && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold mb-2">Insert Image</h3>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="Enter image URL..."
+                className="px-2 py-1 border rounded bg-light-surface dark:bg-dark-surface border-light-border dark:border-dark-border"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addImage();
+                  }
+                }}
+              />
+              <button
+                onClick={addImage}
+                className="px-3 py-1 bg-light-accent dark:bg-dark-accent text-white rounded hover:opacity-90"
+              >
+                Add
+              </button>
+              <button
+                onClick={() => {
+                  setShowImageInput(false);
+                  setImageUrl('');
+                }}
+                className="px-3 py-1 bg-light-border dark:bg-dark-border rounded hover:opacity-90"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
