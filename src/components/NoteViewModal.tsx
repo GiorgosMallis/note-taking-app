@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Note } from '../types/Note';
 import { Category } from '../types/Category';
 import { Tag } from '../types/Tag';
@@ -18,6 +18,20 @@ export const NoteViewModal: React.FC<NoteViewModalProps> = ({
   categories = [],
   tags = [],
 }) => {
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [onClose]);
+
   if (!note) return null;
 
   const formatDate = (dateStr: string) => {
@@ -45,64 +59,73 @@ export const NoteViewModal: React.FC<NoteViewModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-light-surface dark:bg-dark-surface w-full max-w-2xl rounded-xl shadow-2xl p-6 m-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-4">
-          <h2 className="text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary">
-            {note.title}
-          </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={() => onEdit(note)}
-              className="px-3 py-1 rounded-lg bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary hover:opacity-90"
-            >
-              Edit
-            </button>
-            <button
-              onClick={onClose}
-              className="px-3 py-1 rounded-lg bg-light-border dark:bg-dark-border text-light-text-primary dark:text-dark-text-primary hover:opacity-90"
-            >
-              Close
-            </button>
-          </div>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-light-surface dark:bg-dark-surface w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg">
+        <div className="sticky top-0 bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border px-4 py-3 flex justify-between items-center">
+          <h2 className="text-xl font-semibold truncate max-w-[80%] text-light-text-primary dark:text-dark-text-primary">{note.title}</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-light-hover dark:hover:bg-dark-hover rounded-full transition-colors"
+            aria-label="Close modal"
+          >
+            <svg className="w-5 h-5 text-light-text-primary dark:text-dark-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        {/* Content */}
-        <div 
-          className="prose dark:prose-invert max-w-none mb-4"
-          dangerouslySetInnerHTML={{ __html: note.content }}
-        />
+        <div className="p-4 sm:p-6">
+          <div className="space-y-4">
+            <div className="prose prose-sm sm:prose max-w-none dark:prose-invert">
+              <div dangerouslySetInnerHTML={{ __html: note.content }} />
+            </div>
 
-        {/* Footer */}
-        <div className="border-t border-light-border dark:border-dark-border pt-4 mt-4">
-          <div className="flex flex-wrap gap-4 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            {note.categoryId && (
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Category:</span>
-                <span className="bg-light-accent/20 dark:bg-dark-accent/20 px-2 py-0.5 rounded-full">
-                  {getCategoryName(note.categoryId)}
-                </span>
-              </div>
-            )}
-            {note.tags && note.tags.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Tags:</span>
-                <div className="flex flex-wrap gap-2">
-                  {getTagNames(note.tags).map((tagName, index) => (
-                    <span
-                      key={index}
-                      className="bg-light-accent/20 dark:bg-dark-accent/20 px-2 py-0.5 rounded-full"
-                    >
-                      {tagName}
-                    </span>
-                  ))}
+            <div className="border-t border-light-border dark:border-dark-border pt-4 mt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                <div className="flex items-center gap-2">
+                  <span>Created: {formatDate(note.createdAt)}</span>
+                  {note.updatedAt && (
+                    <>
+                      <span className="hidden sm:inline">•</span>
+                      <span>Updated: {formatDate(note.updatedAt)}</span>
+                    </>
+                  )}
                 </div>
               </div>
-            )}
-            <div>
-              <span className="font-medium">Last Updated:</span>{' '}
-              {formatDate(note.updatedAt)}
+
+              <div className="flex flex-wrap gap-2 mt-2">
+                {note.categoryId && (
+                  <div className="flex items-center text-sm">
+                    <span className="mr-2 text-light-text-secondary dark:text-dark-text-secondary">Category:</span>
+                    <span
+                      className="px-2 py-1 rounded-full text-white text-xs"
+                      style={{ backgroundColor: categories.find(c => c.id === note.categoryId)?.color || '#3b82f6' }}
+                    >
+                      {getCategoryName(note.categoryId)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-2">
+                {note.tags && note.tags.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="text-light-text-secondary dark:text-dark-text-secondary">Tags:</span>
+                    {note.tags.map(tagId => {
+                      const tag = tags.find(t => t.id === tagId);
+                      return tag ? (
+                        <span
+                          key={tagId}
+                          className="px-2 py-1 rounded-full text-white text-xs"
+                          style={{ backgroundColor: tag.color }}
+                        >
+                          {tag.name}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

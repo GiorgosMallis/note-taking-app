@@ -15,6 +15,8 @@ interface SidebarProps {
   onNewTag: () => void;
   searchQuery: string;
   onSearch: (query: string) => void;
+  onCategoryDelete?: (categoryId: string) => void;
+  onTagDelete?: (tagId: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -30,6 +32,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onNewTag,
   searchQuery,
   onSearch,
+  onCategoryDelete,
+  onTagDelete,
 }) => {
   const [editingItem, setEditingItem] = useState<{
     item: Category | Tag | null;
@@ -96,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-1">
               <button
                 onClick={() => onCategorySelect(null)}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
+                className={`w-full flex items-center justify-start px-3 py-2 rounded-lg transition-colors ${
                   selectedCategory === null
                     ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
                     : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
@@ -105,26 +109,52 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <span className="flex-1 text-left">All Categories</span>
               </button>
               {categories.map((category) => (
-                <button
+                <div
                   key={category.id}
-                  onClick={() => onCategorySelect(category.id)}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
-                    selectedCategory === category.id
-                      ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
-                      : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
-                  }`}
+                  className="group relative"
                 >
-                  <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: category.color }} />
-                  <span className="text-sm truncate">{category.name}</span>
                   <button
-                    onClick={() => handleEdit(category, 'category')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent"
+                    onClick={() => onCategorySelect(category.id)}
+                    className={`w-full flex items-center justify-start px-3 py-2 rounded-lg transition-colors ${
+                      selectedCategory === category.id
+                        ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
+                        : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
+                    }`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
+                    <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: category.color }} />
+                    <span className="text-sm truncate flex-1 text-left">{category.name}</span>
                   </button>
-                </button>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(category, 'category');
+                      }}
+                      className="p-1.5 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent"
+                      title="Edit category"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    {onCategoryDelete && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+                            onCategoryDelete(category.id);
+                          }
+                        }}
+                        className="p-1.5 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 hover:bg-light-accent dark:hover:bg-dark-accent"
+                        title="Delete category"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -146,7 +176,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-1">
               <button
                 onClick={() => onTagSelect(null)}
-                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
+                className={`w-full flex items-center justify-start px-3 py-2 rounded-lg transition-colors ${
                   selectedTag === null
                     ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
                     : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
@@ -155,26 +185,52 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <span className="flex-1 text-left">All Tags</span>
               </button>
               {tags.map((tag) => (
-                <button
+                <div
                   key={tag.id}
-                  onClick={() => onTagSelect(tag.id)}
-                  className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors ${
-                    selectedTag === tag.id
-                      ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
-                      : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
-                  }`}
+                  className="group relative"
                 >
-                  <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: tag.color }} />
-                  <span className="text-sm truncate">{tag.name}</span>
                   <button
-                    onClick={() => handleEdit(tag, 'tag')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent"
+                    onClick={() => onTagSelect(tag.id)}
+                    className={`w-full flex items-center justify-start px-3 py-2 rounded-lg transition-colors ${
+                      selectedTag === tag.id
+                        ? 'bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary'
+                        : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
+                    }`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
+                    <div className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: tag.color }} />
+                    <span className="text-sm truncate flex-1 text-left">{tag.name}</span>
                   </button>
-                </button>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(tag, 'tag');
+                      }}
+                      className="p-1.5 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-primary dark:hover:text-primary-light hover:bg-light-accent dark:hover:bg-dark-accent"
+                      title="Edit tag"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    {onTagDelete && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Are you sure you want to delete the tag "${tag.name}"?`)) {
+                            onTagDelete(tag.id);
+                          }
+                        }}
+                        className="p-1.5 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-red-500 dark:hover:text-red-400 hover:bg-light-accent dark:hover:bg-dark-accent"
+                        title="Delete tag"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

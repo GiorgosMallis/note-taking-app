@@ -190,6 +190,39 @@ function App() {
     setSearchQuery(query);
   };
 
+  const handleDeleteCategory = (categoryId: string) => {
+    // Remove the category from the categories list
+    setCategories(prev => prev.filter(c => c.id !== categoryId));
+    
+    // Update notes that had this category
+    setNotes(prev => prev.map(note => 
+      note.categoryId === categoryId 
+        ? { ...note, categoryId: null }
+        : note
+    ));
+
+    // If this was the selected category, clear the selection
+    if (selectedCategory === categoryId) {
+      setSelectedCategory(null);
+    }
+  };
+
+  const handleDeleteTag = (tagId: string) => {
+    // Remove the tag from the tags list
+    setTags(prev => prev.filter(t => t.id !== tagId));
+    
+    // Remove this tag from all notes that had it
+    setNotes(prev => prev.map(note => ({
+      ...note,
+      tags: note.tags?.filter(t => t !== tagId) || []
+    })));
+
+    // If this was the selected tag, clear the selection
+    if (selectedTag === tagId) {
+      setSelectedTag(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
       <div className="flex h-screen bg-light-background dark:bg-dark-background">
@@ -208,6 +241,8 @@ function App() {
             onNewTag={handleNewTag}
             searchQuery={searchQuery}
             onSearch={handleSearch}
+            onCategoryDelete={handleDeleteCategory}
+            onTagDelete={handleDeleteTag}
           />
         </div>
 
