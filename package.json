@@ -34,6 +34,7 @@
     "autoprefixer": "^10.4.20",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.13.1",
+    "html2pdf.js": "^0.10.2",
     "lowlight": "^3.2.0",
     "postcss": "^8.4.49",
     "quill": "^2.0.3",
