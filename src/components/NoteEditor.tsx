@@ -10,6 +10,7 @@ interface NoteEditorProps {
   onUpdateTitle: (noteId: string, newTitle: string) => void;
   onSave: () => void;
   onClose: () => void;
+  isGreek?: boolean;
 }
 
 const NoteEditor: React.FC<NoteEditorProps> = ({
@@ -20,6 +21,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
   onUpdateTitle,
   onSave,
   onClose,
+  isGreek = false,
 }) => {
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdateTitle(note.id, e.target.value);
@@ -54,7 +56,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
             onClick={onSave}
             className="px-4 py-2 bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary rounded-lg hover:opacity-90 transition-opacity"
           >
-            Save
+            {isGreek ? "Αποθήκευση" : "Save"}
           </button>
         </div>
       </div>

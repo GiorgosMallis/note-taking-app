@@ -17,6 +17,7 @@ interface SidebarProps {
   onSearch: (query: string) => void;
   onCategoryDelete?: (categoryId: string) => void;
   onTagDelete?: (tagId: string) => void;
+  isGreek?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -34,6 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSearch,
   onCategoryDelete,
   onTagDelete,
+  isGreek = false,
 }) => {
   const [editingItem, setEditingItem] = useState<{
     item: Category | Tag | null;
@@ -61,10 +63,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="relative">
             <input
               type="text"
-              placeholder="Search notes..."
+              placeholder={isGreek ? "Αναζήτηση σημειώσεων..." : "Search notes..."}
               value={searchQuery}
               onChange={(e) => onSearch(e.target.value)}
-              className="w-full px-4 py-2 pl-10 bg-light-accent/50 dark:bg-dark-accent/50 border border-light-border dark:border-dark-border rounded-xl text-light-text-primary dark:text-dark-text-primary placeholder-light-text-muted dark:placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-light-accent dark:focus:ring-dark-accent"
+              className={`w-full px-4 py-2 pl-10 bg-light-accent/50 dark:bg-dark-accent/50 border border-light-border dark:border-dark-border rounded-xl text-light-text-primary dark:text-dark-text-primary placeholder-light-text-muted dark:placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-light-accent dark:focus:ring-dark-accent ${isGreek ? 'text-sm' : ''}`}
             />
             <svg
               className="absolute left-3 top-2.5 w-5 h-5 text-light-text-muted dark:text-dark-text-muted"
@@ -86,11 +88,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex-1 overflow-y-auto">
           <div className="px-3 mb-6">
             <div className="flex items-center justify-between mb-2 px-2">
-              <h2 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary">Categories</h2>
+              <h2 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary">
+                {isGreek ? "Κατηγορίες" : "Categories"}
+              </h2>
               <button
                 onClick={onNewCategory}
                 className="p-1 rounded-lg hover:bg-light-accent dark:hover:bg-dark-accent text-light-text-muted dark:text-dark-text-muted transition-colors"
-                title="Add category"
+                title={isGreek ? "Προσθήκη κατηγορίας" : "Add category"}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -106,7 +110,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
                 }`}
               >
-                <span className="flex-1 text-left">All Categories</span>
+                <span className="flex-1 text-left">
+                  {isGreek ? "Όλες οι κατηγορίες" : "All Categories"}
+                </span>
               </button>
               {categories.map((category) => (
                 <div
@@ -162,11 +168,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           {/* Tags Section */}
           <div className="px-3">
             <div className="flex items-center justify-between mb-2 px-2">
-              <h2 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary">Tags</h2>
+              <h2 className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary">
+                {isGreek ? "Ετικέτες" : "Tags"}
+              </h2>
               <button
                 onClick={onNewTag}
                 className="p-1 rounded-lg hover:bg-light-accent dark:hover:bg-dark-accent text-light-text-muted dark:text-dark-text-muted transition-colors"
-                title="Add tag"
+                title={isGreek ? "Προσθήκη ετικέτας" : "Add tag"}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -182,7 +190,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     : 'hover:bg-light-accent/50 dark:hover:bg-dark-accent/50 text-light-text-muted dark:text-dark-text-muted'
                 }`}
               >
-                <span className="flex-1 text-left">All Tags</span>
+                <span className="flex-1 text-left">
+                  {isGreek ? "Όλες οι ετικέτες" : "All Tags"}
+                </span>
               </button>
               {tags.map((tag) => (
                 <div

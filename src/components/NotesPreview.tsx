@@ -16,6 +16,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   rectSortingStrategy,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Note } from '../types/Note';
 import { Category } from '../types/Category';
@@ -25,14 +26,15 @@ import NoteViewModal from './NoteViewModal';
 
 interface NotesPreviewProps {
   notes: Note[];
-  categories?: Category[];
-  tags?: Tag[];
+  categories: Category[];
+  tags: Tag[];
   onNoteSelect: (note: Note) => void;
   onDeleteNote: (noteId: string) => void;
   onTogglePin: (noteId: string) => void;
   onCategorySelect?: (categoryId: string) => void;
   onTagSelect?: (tagId: string) => void;
   onReorder: (notes: Note[]) => void;
+  isGridView: boolean;
 }
 
 export const NotesPreview: React.FC<NotesPreviewProps> = ({
@@ -45,6 +47,7 @@ export const NotesPreview: React.FC<NotesPreviewProps> = ({
   onCategorySelect,
   onTagSelect,
   onReorder,
+  isGridView,
 }) => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isViewMode, setIsViewMode] = useState(false);
@@ -186,10 +189,13 @@ export const NotesPreview: React.FC<NotesPreviewProps> = ({
             <p className="text-sm mt-2">Create your first note to get started!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 p-4">
+          <div className={isGridView ? 
+            "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 p-4" : 
+            "flex flex-col gap-2 p-4"
+          }>
             <SortableContext
               items={notes.map((note) => note.id)}
-              strategy={rectSortingStrategy}
+              strategy={isGridView ? rectSortingStrategy : verticalListSortingStrategy}
             >
               {notes.map((note) => (
                 <SortableNote
@@ -203,6 +209,7 @@ export const NotesPreview: React.FC<NotesPreviewProps> = ({
                   onTagClick={handleTagClick}
                   categories={categories || []}
                   tags={tags || []}
+                  isGridView={isGridView}
                 />
               ))}
             </SortableContext>
@@ -221,6 +228,7 @@ export const NotesPreview: React.FC<NotesPreviewProps> = ({
               categories={categories || []}
               tags={tags || []}
               isDragging
+              isGridView={isGridView}
             />
           ) : null}
         </DragOverlay>

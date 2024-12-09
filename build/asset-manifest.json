@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/note-taking-app/static/css/main.109f9156.css",
-    "main.js": "/note-taking-app/static/js/main.7381bcd8.js",
+    "main.css": "/note-taking-app/static/css/main.9a67aceb.css",
+    "main.js": "/note-taking-app/static/js/main.dd20d4e5.js",
     "static/js/213.e93c3401.chunk.js": "/note-taking-app/static/js/213.e93c3401.chunk.js",
     "static/js/732.7348dcd4.chunk.js": "/note-taking-app/static/js/732.7348dcd4.chunk.js",
     "index.html": "/note-taking-app/index.html",
-    "main.109f9156.css.map": "/note-taking-app/static/css/main.109f9156.css.map",
-    "main.7381bcd8.js.map": "/note-taking-app/static/js/main.7381bcd8.js.map",
+    "main.9a67aceb.css.map": "/note-taking-app/static/css/main.9a67aceb.css.map",
+    "main.dd20d4e5.js.map": "/note-taking-app/static/js/main.dd20d4e5.js.map",
     "213.e93c3401.chunk.js.map": "/note-taking-app/static/js/213.e93c3401.chunk.js.map",
     "732.7348dcd4.chunk.js.map": "/note-taking-app/static/js/732.7348dcd4.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.109f9156.css",
-    "static/js/main.7381bcd8.js"
+    "static/css/main.9a67aceb.css",
+    "static/js/main.dd20d4e5.js"
   ]
 }

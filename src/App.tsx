@@ -20,6 +20,14 @@ function App() {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
+  const [isGridView, setIsGridView] = useState(() => {
+    const savedView = localStorage.getItem('viewMode');
+    return savedView ? savedView === 'grid' : true;
+  });
+  const [isGreek, setIsGreek] = useState(() => {
+    const savedLang = localStorage.getItem('language');
+    return savedLang === 'gr';
+  });
 
   const [categories, setCategories] = useState<Category[]>(() => {
     const savedCategories = storageService.getCategories();
@@ -57,6 +65,14 @@ function App() {
     document.documentElement.classList.toggle('dark', isDarkTheme);
     localStorage.setItem('theme', isDarkTheme ? 'dark' : 'light');
   }, [isDarkTheme]);
+
+  useEffect(() => {
+    localStorage.setItem('viewMode', isGridView ? 'grid' : 'list');
+  }, [isGridView]);
+
+  useEffect(() => {
+    localStorage.setItem('language', isGreek ? 'gr' : 'en');
+  }, [isGreek]);
 
   const getCategoryColor = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
@@ -243,6 +259,7 @@ function App() {
             onSearch={handleSearch}
             onCategoryDelete={handleDeleteCategory}
             onTagDelete={handleDeleteTag}
+            isGreek={isGreek}
           />
         </div>
 
@@ -250,11 +267,35 @@ function App() {
         <div className="ml-64 flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Top Bar */}
           <div className="h-16 flex-shrink-0 flex items-center justify-between px-4 sm:px-6 bg-light-surface dark:bg-dark-surface border-b border-light-border dark:border-dark-border w-full">
-            <h1 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary truncate">Notes</h1>
+            <h1 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary truncate">
+              {isGreek ? "Σημειώσεις" : "Notes"}
+            </h1>
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               <button
+                onClick={() => setIsGridView(!isGridView)}
+                className="p-2 rounded-lg bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary hover:opacity-90 transition-opacity"
+                title={isGridView ? "Switch to list view" : "Switch to grid view"}
+              >
+                {isGridView ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={() => setIsGreek(!isGreek)}
+                className="p-2 rounded-lg bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary hover:opacity-90 transition-opacity"
+                title={isGreek ? "Switch to English" : "Αλλαγή σε Ελληνικά"}
+              >
+                {isGreek ? "EN" : "GR"}
+              </button>
+              <button
                 onClick={() => setIsDarkTheme(!isDarkTheme)}
-                className="p-2 rounded-lg bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary hover:bg-light-border dark:hover:bg-dark-border transition-colors"
+                className="p-2 rounded-lg bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary hover:opacity-90 transition-opacity"
               >
                 {isDarkTheme ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,9 +309,9 @@ function App() {
               </button>
               <button
                 onClick={handleCreateNote}
-                className="px-3 sm:px-4 py-2 bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary rounded-lg hover:opacity-90 transition-opacity"
+                className="px-4 py-2 bg-light-accent dark:bg-dark-accent text-light-text-primary dark:text-dark-text-primary rounded-lg hover:opacity-90 transition-opacity"
               >
-                New Note
+                {isGreek ? "Νέα Σημείωση" : "New Note"}
               </button>
             </div>
           </div>
@@ -287,6 +328,7 @@ function App() {
               onCategorySelect={(categoryId: string) => setSelectedCategory(categoryId)}
               onTagSelect={(tagId: string) => setSelectedTag(tagId)}
               onReorder={handleReorderNotes}
+              isGridView={isGridView}
             />
           </div>
         </div>
@@ -306,6 +348,7 @@ function App() {
                   setCurrentNote(null);  // Return to main page after saving
                 }}
                 onClose={() => setCurrentNote(null)}
+                isGreek={isGreek}
               />
             </div>
           </div>
